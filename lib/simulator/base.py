@@ -443,7 +443,7 @@ class BacktestSys(object):
         # 根据yaml配置文件从数据库中抓取数据，并对回测进行参数设置
         current_yaml = '.'.join((os.path.splitext(self.current_file)[0], 'yaml'))
         f = open(current_yaml, encoding='utf-8')
-        self.conf = yaml.load(f, Loader=yaml.FullLoader)
+        self.conf = yaml.load(f)
 
         # 回测起始时间
         self.start_dt = datetime.strptime(self.conf['start_date'], '%Y%m%d')

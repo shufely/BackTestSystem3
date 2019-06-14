@@ -1,0 +1,371 @@
+
+host: 192.168.1.172
+port: 27017
+db_name: CBNB
+user: liye
+pwd: liye
+
+start_date: '20130101'
+end_date: '20190301'
+capital: 1e8
+backtest_mode: CLOSE  # 回测方式，CLOSE为以当天收盘价交易, OPEN为以第二天开盘价交易
+switch_contract: 1
+date_type: SHSE
+turnover: 1
+
+data:
+
+  future_price:
+
+    -
+      collection: FuturesMD # 如果没有该字段，则默认为FuturesMD
+      obj_field: wind_code
+      obj_content: TA.CZC
+      commodity: PTA
+      fields: [OPEN, CLOSE]
+
+    - collection: FuturesMD
+      obj_field: wind_code
+      obj_content: EG.DCE
+      commodity: MEG
+      fields: [OPEN, CLOSE]
+
+    -
+      collection: FuturesMD
+      obj_field: wind_code
+      obj_content: L.DCE
+      commodity: LL
+      fields: [OPEN, CLOSE]
+
+    -
+      collection: FuturesMD
+      obj_field: wind_code
+      obj_content: MA.CZC
+      commodity: MA
+      fields: [OPEN, CLOSE]
+
+    -
+      collection: FuturesMD
+      obj_field: wind_code
+      obj_content: RB.SHF
+      commodity: RB
+      fields: [OPEN, CLOSE]
+
+    -
+      collection: FuturesMD
+      obj_field: wind_code
+      obj_content: J.DCE
+      commodity: J
+      fields: [OPEN, CLOSE]
+
+    -
+      collection: FuturesMD
+      obj_field: wind_code
+      obj_content: JM.DCE
+      commodity: JM
+      fields: [OPEN, CLOSE]
+
+    -
+      collection: FuturesMD
+      obj_field: wind_code
+      obj_content: HC.SHF
+      commodity: HC
+      fields: [OPEN, CLOSE]
+
+    -
+      collection: FuturesMD
+      obj_field: wind_code
+      obj_content: BU.SHF
+      commodity: BU
+      fields: [OPEN, CLOSE]
+
+    -
+      collection: FuturesMD
+      obj_field: wind_code
+      obj_content: ZC.CZC
+      commodity: ZC
+      fields: [OPEN, CLOSE]
+
+    -
+      collection: FuturesMD
+      obj_field: wind_code
+      obj_content: I.DCE
+      commodity: I
+      fields: [OPEN, CLOSE]
+
+    -
+      collection: FuturesMD
+      obj_field: wind_code
+      obj_content: PP.DCE
+      commodity: PP
+      fields: [OPEN, CLOSE]
+
+    -
+      collection: FuturesMD
+      obj_field: wind_code
+      obj_content: V.DCE
+      commodity: PVC
+      fields: [OPEN, CLOSE]
+
+    -
+      collection: FuturesMD
+      obj_field: wind_code
+      obj_content: RU.SHF
+      commodity: RU
+      fields: [OPEN, CLOSE]
+
+    -
+      collection: FuturesMD
+      obj_field: wind_code
+      obj_content: SC.INE
+      commodity: SC
+      fields: [OPEN, CLOSE]
+
+    -
+      collection: FuturesMD
+      obj_field: wind_code
+      obj_content: FU.SHF
+      commodity: FU
+      fields: [OPEN, CLOSE]
+
+    -
+      collection: FuturesMD
+      obj_field: tr_code
+      obj_content: LCOc1
+      commodity: Brent
+      fields: [OPEN, CLOSE]
+      unit_change: dollar
+
+    -
+      collection: FuturesMD
+      obj_field: tr_code
+      obj_content: CLc1
+      commodity: WTI
+      fields: [OPEN, CLOSE]
+      unit_change: dollar
+
+    -
+      collection: FuturesMD
+      obj_field: tr_code
+      obj_content: RBc1
+      commodity: RBOB
+      fields: [OPEN, CLOSE]
+      unit_change: dollar
+
+    -
+      collection: FuturesMD
+      obj_field: tr_code
+      obj_content: HOc1
+      commodity: HO
+      fields: [OPEN, CLOSE]
+      unit_change: dollar
+
+    -
+      collection: FuturesMD
+      obj_field: tr_code
+      obj_content: NACFRJPSWMc1
+      commodity: MOPJ
+      fields: [CLOSE]
+      unit_change: dollar
+
+    -
+      collection: FuturesMD
+      obj_field: tr_code
+      obj_content: GO10SGSWMc1
+      commodity: Gasoil10
+      fields: [CLOSE]
+      unit_change: dollar
+
+    -
+      collection: FuturesMD
+      obj_field: tr_code
+      obj_content: MOG92SGMc1
+      commodity: MOGAS
+      fields: [CLOSE]
+      unit_change: dollar
+
+
+trade_unit:
+  PTA: 5
+  MEG: 10
+  PP: 5
+  LL: 5
+  RB: 10
+  HC: 10
+  J: 100
+  JM: 60
+  I: 100
+  MA: 10
+  ZC: 100
+  BU: 10
+  PVC: 5
+  RU: 10
+  SC: 1000
+  FU: 10
+  Brent: 1000
+  WTI: 1000
+  RBOB: 42000
+  HO: 42000
+  MOPJ: 1000
+  MOGAS: 1000
+  Gasoil10: 100
+
+margin_ratio:
+  TA.CZC: 0.07
+  EG.DCE: 0.07
+  PP.DCE: 0.07
+  L.DCE: 0.07
+  RB.SHF: 0.07
+  HC.SHF: 0.07
+  J.DCE: 0.07
+  JM.DCE: 0.07
+  I.DCE: 0.07
+  MA.CZC: 0.07
+  ZC.CZC: 0.07
+  BU.SHF: 0.07
+  V.DCE: 0.07
+  RU.SHF: 0.09
+  SC.INE: 0.07
+  FU.SHF: 0.08
+  LCOc1: 0.05
+  CLc1: 0.01
+  RBc1: 0.05
+  HOc1: 0.05
+  NACFRJPSWMc1: 0.05
+  GO10SGSWMc1: 0.05
+  MOG92SGMc1: 0.05
+
+
+tcost: 0
+
+tcost_list:
+  TA.CZC:
+    mode: fixed
+    value: 24
+  PP.DCE:
+    mode: percentage
+    value: 0.00024
+  L.DCE:
+    mode: fixed
+    value: 8
+  RB.SHF:
+    mode: percentage
+    value: 0.0004
+  HC.SHF:
+    mode: percentage
+    value: 0.0004
+  J.DCE:
+    mode: percentage
+    value: 0.00024
+  JM.DCE:
+    mode: percentage
+    value: 0.00024
+  I.DCE:
+    mode: percentage
+    value: 0.00048
+  MA.CZC:
+    mode: fixed
+    value: 16
+  ZC.CZC:
+    mode: fixed
+    value: 16
+  BU.SHF:
+    mode: percentage
+    value: 0.0004
+  V.DCE:
+    mode: fixed
+    value: 8
+  LCOc1:
+    mode: fixed
+    value: 7
+
+
+arbitrage_library:
+
+#    LL-Brent:
+#        formula: var1-(var2*7.5+75+380)*1.16*1.065*ExRate-150
+    PP-MA:
+        formula: var1 - 3*var2
+    MA-ZC:
+        formula: var1 - 1.85*var2-637
+    ZC-MA-PP:
+        formula: (var3-3*var2)/3-(var2-1.85*var1-637)
+    LL-PP:
+        formula: var1 - var2
+#    PP-LPG:
+#        formula: var1 - (var2+200)*1.01*1.16*ExRate
+    LL-PVC:
+        formula: var1 - var2
+    PP-PVC:
+        formula: var1 - var2
+#    PTA-Brent:
+#        formula: var1-(var2*7.5+95+450)*ExRate*1.02*1.17*0.656
+#    PTA-PX:
+#        formula: var1-var2*ExRate*0.66*1.16*1.02
+#    PX-MOPJ:
+#        formula: var1 - var2
+#    BZ-MOPJ:
+#        formula: var1 - var2
+#    SM-MOPJ:
+#        formula: var1 - 1.08*var2
+#    SM-BZ:
+#        formula: var1 - 0.79*var2
+    MEG-PTA:
+        formula: var1 - var2
+    MEG-ZC:
+        formula: var1 - 6*var2
+    MEG-MA:
+        formula: var1 - 1.6335*var2
+    LL-PTA:
+        formula: var1 - var2
+    PVC-J:
+        formula: var1 - 2*var2
+    RB-J-I:
+        formula: var1-1.7*var3-0.5*var2-800
+    J-JM:
+        formula: var1-1.2*var2-50
+    HC-RB:
+        formula: var1 - var2
+    HC-J:
+        formula: var1-0.95*var2-1000
+    RB-I:
+        formula: var1-3.5*var2-800
+    J-ZC:
+        formula: var1 - var2
+#    Brent-WTI:
+#        formula: var1 - var2
+#    MOPJ-Brent:
+#        formula: var1-7.5*var2
+#    HO-Brent:
+#        formula: 42*var1 - var2
+#    Gasoil10-Brent:
+#        formula: var1 - var2
+#    RBOB-Brent:
+#        formula: 42*var1 - var2
+#    RBOB-MOPJ:
+#        formula: 42*var1 - (1/7.5)*var2
+#    MOGAS-Brent:
+#        formula: var1 - var2
+#    MOGAS-MOPJ:
+#        formula: var1-(1/8.9)*var2
+#    180-Brent:
+#        formula: (1/6.35)*var1 - var2
+#    380-Brent:
+#        formula: (1/6.35)*var1 - var2
+#    BU-Brent:
+#        formula: var1-7.5*ExRate*var2
+    BU-SC:
+        formula: var1-7.3*var2
+#    BU-380: var1-ExRate*var2
+    BU-FU:
+        formula: var1 - var2
+#    LPG-MOPJ:
+#        formula: var1 - var2
+#    LPG-180:
+#        formula: var1 - var2
+#    LPG-380:
+#        formula: var1 - var2
+#    LPG-Mogas:
+#        formula: var1 - var2
+#    LPG-Gasoil10:
+#        formula: var1 - var2
