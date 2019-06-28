@@ -1,5 +1,9 @@
 """
 根据基本面的研究生成各品种的利润率数据，并入库
+这里需要对数据的时间进行平移
+如果都是期货的数据不需要平移
+如果都是现货的数据不需要平移
+如果期货和现货或者路透的外盘数据，则需要将现货和路透的数据向后平移一天
 """
 
 import pymongo
@@ -58,13 +62,17 @@ class ProfitRate(object):
         exrate.rename(columns={'CLOSE': 'ExRate'}, inplace=True)
 
         total_df = ll.join(mopj, how='outer')
-        total_df = total_df.join(exrate, how='outer')
+        total_df = total_df.join(exrate, how='left')  #这里需要注意汇率数据，不要使用outer方法
+
+        if method == 'future':
+            total_df['MOPJ'] = total_df['MOPJ'].shift(periods=1)
         total_df.fillna(method='ffill', inplace=True)
         total_df.dropna(inplace=True)
 
         total_df['upper_profit'] = total_df['L.DCE'] - (total_df['MOPJ'] + 380) * 1.13 * 1.065 * total_df['ExRate'] - 150
         total_df['upper_profit_rate'] = total_df['upper_profit'] / ((total_df['MOPJ'] + 380) * 1.13 * 1.065 *
                                                                     total_df['ExRate'] + 150)
+
         total_df.drop(columns=['L.DCE', 'MOPJ', 'ExRate'], inplace=True)
         total_df['date'] = total_df.index
         total_df['commodity'] = 'L.DCE'
@@ -662,7 +670,10 @@ class ProfitRate(object):
         exrate.rename(columns={'CLOSE': 'ExRate'}, inplace=True)
 
         total_df = bu.join(dub, how='outer')
-        total_df = total_df.join(exrate, how='outer')
+        total_df = total_df.join(exrate, how='left')
+        if method == 'future':
+            total_df['DUB-1M'] = total_df['DUB-1M'].shift(periods=1)
+
         total_df.fillna(method='ffill', inplace=True)
         total_df.dropna(inplace=True)
 
@@ -733,7 +744,9 @@ class ProfitRate(object):
         exrate.rename(columns={'CLOSE': 'ExRate'}, inplace=True)
 
         total_df = ta.join(px, how='outer')
-        total_df = total_df.join(exrate, how='outer')
+        total_df = total_df.join(exrate, how='left')
+        if method == 'future':
+            total_df['PX'] = total_df['PX'].shift(periods=1)
         total_df.fillna(method='ffill', inplace=True)
         total_df.dropna(inplace=True)
 
@@ -774,24 +787,24 @@ class ProfitRate(object):
         sys.stdout.flush()
 
 a = ProfitRate()
-# a.calc_ll_profit_rate(method='future')
-# a.calc_ll_profit_rate(method='spot')
-# a.calc_pp_profit_rate(method='future')
-# a.calc_pp_profit_rate(method='spot')
-# a.calc_ma_profit_rate(method='future')
-# a.calc_ma_profit_rate(method='spot')
-# a.calc_meg_profit_rate(method='future')
-# a.calc_meg_profit_rate(method='spot')
-# a.calc_rb_profit_rate(method='future')
-# a.calc_rb_profit_rate(method='spot')
-# a.calc_hc_profit_rate(method='future')
-# a.calc_hc_profit_rate(method='spot')
-# a.calc_j_profit_rate(method='future')
-# a.calc_j_profit_rate(method='spot')
-# a.get_ru_profit_rate()
-# a.get_pvc_profit_rate()
-# a.calc_bu_profit_rate(method='future')
-# a.calc_bu_profit_rate(method='spot')
+a.calc_ll_profit_rate(method='future')
+a.calc_ll_profit_rate(method='spot')
+a.calc_pp_profit_rate(method='future')
+a.calc_pp_profit_rate(method='spot')
+a.calc_ma_profit_rate(method='future')
+a.calc_ma_profit_rate(method='spot')
+a.calc_meg_profit_rate(method='future')
+a.calc_meg_profit_rate(method='spot')
+a.calc_rb_profit_rate(method='future')
+a.calc_rb_profit_rate(method='spot')
+a.calc_hc_profit_rate(method='future')
+a.calc_hc_profit_rate(method='spot')
+a.calc_j_profit_rate(method='future')
+a.calc_j_profit_rate(method='spot')
+a.get_ru_profit_rate()
+a.get_pvc_profit_rate()
+a.calc_bu_profit_rate(method='future')
+a.calc_bu_profit_rate(method='spot')
 a.calc_pta_profit_rate(method='future')
 a.calc_pta_profit_rate(method='spot')
 
