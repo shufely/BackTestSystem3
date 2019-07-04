@@ -3,14 +3,11 @@ from lib.simulator.base import BacktestSys, HoldingClass, DataClass
 import numpy as np
 import re
 import pandas as pd
+import traceback
 
 class BasisSpread(BacktestSys):
-    def __init__(self):
-        # super(BasisSpread, self).__init__()
-        self.current_file = __file__
-        self.prepare()
 
-    def strategy(self):
+    def strategy(self, num, profit_window, iv_window, long_window, short_window):
 
         future_price = self.data['future_price']
         spot_price = self.data['spot_price']
@@ -21,11 +18,13 @@ class BasisSpread(BacktestSys):
         for k, v in profit_rate.items():
             df_profit[v.commodity] = v.upper_profit_rate
 
-        # PVC/RU的利润率需要往后移一天
+        # ========================回测的时候需要======================
+        # PVC/RU/TA/BU的利润率需要往后移一天
         df_profit[['V', 'RU']] = df_profit[['V', 'RU']].shift(periods=1)
+
         df_profit.fillna(method='ffill', inplace=True)
-        profit_mean = df_profit.rolling(window=20).mean()
-        profit_std = df_profit.rolling(window=20).std()
+        profit_mean = df_profit.rolling(window=profit_window).mean()
+        profit_std = df_profit.rolling(window=profit_window).std()
         df_profit = (df_profit - profit_mean) / profit_std
         # df_profit = df_profit.rolling(window=60, min_periods=50).mean()
         # profit_chg = df_profit.pct_change(periods=20)
@@ -45,6 +44,8 @@ class BasisSpread(BacktestSys):
                 iv_df[v.commodity] = v.CLOSE
             elif 'CLOSE' in v.__dict__ and v.commodity in iv_df:
                 iv_df[v.commodity] += v.CLOSE
+
+        # =============回测的时候需要=================
         # L和PP的库存需要往后移一周
         iv_df[['L', 'PP']] = iv_df[['L', 'PP']].shift(periods=5)
 
@@ -54,6 +55,8 @@ class BasisSpread(BacktestSys):
             elif 'CLOSE' in v.__dict__:
                 sp_df[v.commodity] = v.CLOSE
 
+        sp_df.fillna(method='ffill', inplace=True)
+
         for k, v in future_price.items():
             fp_df[v.commodity] = v.CLOSE
 
@@ -61,12 +64,12 @@ class BasisSpread(BacktestSys):
             index_vol[v.commodity] = v.VOLUME
             index_oi[v.commodity] = v.OI
 
-        oi_short_mean = index_oi.rolling(window=5).mean()
-        oi_long_mean = index_oi.rolling(window=20).mean()
+        oi_short_mean = index_oi.rolling(window=short_window).mean()
+        oi_long_mean = index_oi.rolling(window=long_window).mean()
         oi_chg = oi_short_mean / oi_long_mean
 
-        vol_short_mean = index_vol.rolling(window=5).mean()
-        vol_long_mean = index_vol.rolling(window=20).mean()
+        vol_short_mean = index_vol.rolling(window=short_window).mean()
+        vol_long_mean = index_vol.rolling(window=long_window).mean()
         vol_chg = vol_short_mean / vol_long_mean
 
         df_profit = df_profit * oi_chg * vol_chg
@@ -75,13 +78,13 @@ class BasisSpread(BacktestSys):
         profit_rank = df_profit.rank(axis=1)
         profit_count = profit_rank.count(axis=1)
 
-        holdings_profit_num = np.minimum(profit_count // 2, 3)
+        holdings_profit_num = np.minimum(profit_count // 2, num)
         holdings_profit_num[holdings_profit_num == 0] = np.nan
 
         # 库存变化率
         # iv_df = iv_df.shift(periods=1)
-        iv_mean = iv_df.rolling(window=20).mean()
-        iv_std = iv_df.rolling(window=20).std()
+        iv_mean = iv_df.rolling(window=iv_window).mean()
+        iv_std = iv_df.rolling(window=iv_window).std()
         iv_change = (iv_df - iv_mean) / iv_std
 
         iv_change = iv_change * oi_chg * vol_chg
@@ -90,11 +93,13 @@ class BasisSpread(BacktestSys):
         iv_rank = iv_change.rank(axis=1)
         iv_rank_count = iv_rank.count(axis=1)
 
-        holdings_iv_num = np.minimum(iv_rank_count // 2, 3)
+        holdings_iv_num = np.minimum(iv_rank_count // 2, num)
         holdings_iv_num[holdings_iv_num == 0] = np.nan
 
+        # ================回测的时候需要========================
         # 现货价格需要往后移一天
         sp_df = sp_df.shift(periods=1)
+
         bs_df = 1. - fp_df[sp_df.columns] / sp_df
         # bs_df = sp_df - fp_df[sp_df.columns]
         # bs_mean = bs_df.rolling(window=250, min_periods=200).mean()
@@ -106,13 +111,14 @@ class BasisSpread(BacktestSys):
         bs_rank = bs_df.rank(axis=1)
         bs_rank_count = bs_rank.count(axis=1)
 
-        holdings_bs_num = np.minimum(bs_rank_count // 2, 3)
+        holdings_bs_num = np.minimum(bs_rank_count // 2, num)
         holdings_bs_num[holdings_bs_num == 0] = np.nan
 
         rtn_df = fp_df.pct_change(periods=10)
+        rtn_df = rtn_df * vol_chg * oi_chg
         rtn_rank = rtn_df.rank(axis=1)
         rtn_count = rtn_rank.count(axis=1)
-        holdings_rtn_num = np.minimum(rtn_count // 2, 3)
+        holdings_rtn_num = np.minimum(rtn_count // 2, num)
         holdings_rtn_num[holdings_rtn_num == 0] = np.nan
 
         holdings_df = pd.DataFrame(0, index=self.dt, columns=list(future_price.keys()))
@@ -120,14 +126,15 @@ class BasisSpread(BacktestSys):
         for c in holdings_df:
             for k, v in future_price.items():
                 if k == c:
-                    if v.commodity not in profit_rank:
-                        continue
+
                     holdings_df[c][iv_rank[v.commodity] > iv_rank_count - holdings_iv_num] += -1
                     holdings_df[c][iv_rank[v.commodity] <= holdings_iv_num] += 1
 
                     holdings_df[c][bs_rank[v.commodity] > bs_rank_count - holdings_bs_num] += 1
                     holdings_df[c][bs_rank[v.commodity] <= holdings_bs_num] += -1
 
+                    if v.commodity not in profit_rank:
+                        continue
                     holdings_df[c][profit_rank[v.commodity] > profit_count - holdings_profit_num] += -1
                     holdings_df[c][profit_rank[v.commodity] <= holdings_profit_num] += 1
 
@@ -141,15 +148,46 @@ class BasisSpread(BacktestSys):
 
         return holdings
 
+    def optimal(self):
+        test_df = pd.DataFrame(columns=['num', 'profit_window', 'iv_window', 'short_window', 'long_window'])
+        final_df = pd.DataFrame(columns=['num', 'profit_window', 'iv_window', 'short_window', 'long_window', 'AnnualRtn',
+                                         'AnnualVol', 'Sharpe', 'MaxDrawdown', 'MaxDDStart', 'MaxDDEnd', 'Turnover',
+                                         'Days', 'NetValueInit', 'NetValueFinal'])
+        count = 1
+        total = len([3, 4, 5])*len(range(10, 200, 10))*len(range(10, 100, 10))*len(range(5, 30, 5))*len(range(5, 30, 5))
+        try:
+            for num in [3, 4, 5]:
+                for profit_window in range(10, 200, 10):
+                    for iv_window in range(10, 100, 10):
+                        for short_window in range(5, 30, 5):
+                            for gap in range(5, 30, 5):
+                                pctg = count/total*100
+                                print('\r'+'进度:{:.4f}%|{}|'.format(pctg, '>'*int(pctg)+'-'*(100-int(pctg))), end='')
+                                holdings = self.strategy(num, profit_window, iv_window, short_window + gap, short_window)
+                                holdings = self.holdingsStandardization(holdings, mode=1)
+                                holdings = self.holdingsProcess(holdings)
+                                res_df = self.getTotalResult(holdings, show=False)
+                                test_df.loc[count-1] = [num, profit_window, iv_window, short_window, short_window+gap]
+                                final_df.loc[count-1] = test_df.loc[count-1].append(res_df.loc['total'])
+                                count += 1
+        except:
+            final_df.to_csv(r'C:\Users\uuuu\Desktop\optimal.csv', encoding='gbk')
+            traceback.print_exc()
+        finally:
+            final_df.to_csv(r'C:\Users\uuuu\Desktop\optimal.csv', encoding='gbk')
+        # max_id = final_df['NV'].idxmax()
+        # for x in ['num', 'profit_window', 'iv_window', 'short_window', 'long_window', 'NV']:
+        #     print('{}:{}'.format(x, final_df[x][max_id]))
+
 
 if __name__ == '__main__':
     a = BasisSpread()
-    holdings = a.strategy()
+    holdings = a.strategy(3, 20, 60, 20, 5)
+    # holdings = a.strategy(5, 190, 80, 40, 15)
     holdings = a.holdingsStandardization(holdings, mode=1)
-    # for h in holdings.asset:
-    #     holdings.update_holdings(h, 2 * getattr(holdings, h))
     holdings = a.holdingsProcess(holdings)
-
+    #
     a.displayResult(holdings, saveLocal=True)
+    # a.optimal()
 
 

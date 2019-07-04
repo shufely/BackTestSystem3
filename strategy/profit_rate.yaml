@@ -6,8 +6,8 @@ user: liye
 pwd: liye
 
 start_date: '20130101'
-end_date: '20190612'
-capital: 1e6
+end_date: '20190702'
+capital: 1e7
 backtest_mode: OPEN  # 回测方式，CLOSE为以当天收盘价交易, OPEN为以第二天开盘价交易
 
 switch_contract: 1
@@ -202,14 +202,14 @@ data:
       obj_content: "天津港:平仓价(含税):一级冶金焦(A<12.5%,<0.65%S,CSR>65%,Mt8%):山西产"
       commodity: J
       fields: [CLOSE]
-#
-#    -
-#      collection: SpotMD
-#      obj_field: edb_name
-#      obj_content: "车板价:青岛港:澳大利亚:PB粉矿:61.5%"
-#      commodity: I
-#      fields: [CLOSE]
-#
+
+    -
+      collection: SpotMD
+      obj_field: edb_name
+      obj_content: "车板价:青岛港:澳大利亚:PB粉矿:61.5%"
+      commodity: I
+      fields: [CLOSE]
+
     -
       collection: SpotMD
       obj_field: edb_name
@@ -217,19 +217,19 @@ data:
       commodity: HC
       fields: [CLOSE]
 
-#    -
-#      collection: SpotMD
-#      obj_field: edb_name
-#      obj_content: "天津港:库提价(含税):主焦煤(A<8%,V28%,0.8%S,G95,Y20mm):澳大利亚产"
-#      commodity: JM
-#      fields: [CLOSE]
-#
-#    -
-#      collection: SpotMD
-#      obj_field: edb_name
-#      obj_content: "秦皇岛港:平仓价:动力末煤(Q5500):山西产"
-#      commodity: ZC
-#      fields: [CLOSE]
+    -
+      collection: SpotMD
+      obj_field: edb_name
+      obj_content: "天津港:库提价(含税):主焦煤(A<8%,V28%,0.8%S,G95,Y20mm):澳大利亚产"
+      commodity: JM
+      fields: [CLOSE]
+
+    -
+      collection: SpotMD
+      obj_field: edb_name
+      obj_content: "秦皇岛港:平仓价:动力末煤(Q5500):山西产"
+      commodity: ZC
+      fields: [CLOSE]
 
     - collection: SpotMD
       obj_field: edb_name
@@ -350,13 +350,13 @@ data:
       fields: [CLOSE]
       frequency: weekly
 
-#
-#    - collection: Inventory
-#      obj_field: edb_name
-#      obj_content: "炼焦煤库存:六港口合计"
-#      commodity: JM
-#      fields: [CLOSE]
-#      frequency: weekly
+
+    - collection: Inventory
+      obj_field: edb_name
+      obj_content: "炼焦煤库存:六港口合计"
+      commodity: JM
+      fields: [CLOSE]
+      frequency: weekly
 
     - collection: Inventory
       obj_field: commodity
@@ -372,19 +372,19 @@ data:
       fields: [inventory]
       frequency: weekly
 
-#    - collection: Inventory
-#      obj_field: edb_name
-#      obj_content: "煤炭库存:秦皇岛港:周"
-#      commodity: ZC
-#      fields: [CLOSE]
-#      frequency: weekly
+    - collection: Inventory
+      obj_field: edb_name
+      obj_content: "煤炭库存:秦皇岛港:周"
+      commodity: ZC
+      fields: [CLOSE]
+      frequency: weekly
 
-#    - collection: Inventory
-#      obj_field: edb_name
-#      obj_content: "全国主要港口:铁矿石库存:总计(45港口)"
-#      commodity: I
-#      fields: [CLOSE]
-#      frequency: weekly
+    - collection: Inventory
+      obj_field: edb_name
+      obj_content: "全国主要港口:铁矿石库存:总计(45港口)"
+      commodity: I
+      fields: [CLOSE]
+      frequency: weekly
 
     - collection: Inventory
       obj_field: commodity

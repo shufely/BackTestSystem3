@@ -25,6 +25,7 @@ class Basic(BacktestSys):
                 spot_df[v.commodity] = v.CLOSE
             elif 'price' in v.__dict__:
                 spot_df[v.commodity] = v.price
+        spot_df = spot_df.shift(periods=1)  # 现货价格需要往后移一天
 
         for v in self.data['inventory'].values():
             if v.commodity == 'J':
@@ -36,9 +37,11 @@ class Basic(BacktestSys):
                 inventory_df[v.commodity] = v.CLOSE
             elif 'inventory' in v.__dict__:
                 inventory_df[v.commodity] = v.inventory
+        inventory_df[['L', 'PP']] = inventory_df[['L', 'PP']].shift(periods=5)  # L和PP的库存需要往后移一周
 
         for v in self.data['profit_rate'].values():
             profit_df[v.commodity] = v.upper_profit_rate
+        profit_df[['V', 'RU']] = profit_df[['V', 'RU']].shift(periods=1)  # 现货价格需要往后移一天
 
         for k, v in self.data['future_price'].items():
             future_df[v.commodity] = getattr(v, self.conf['backtest_mode'])
@@ -46,8 +49,8 @@ class Basic(BacktestSys):
                 raise LookupError('{}的现货价格数据未提取！'.format(v.commodity))
             if v.commodity not in inventory_df:
                 raise LookupError('{}的库存数据未提取！'.format(v.commodity))
-            if v.commodity not in profit_df:
-                raise LookupError('{}的加工利润率数据未提取！'.format(v.commodity))
+            # if v.commodity not in profit_df:
+            #     raise LookupError('{}的加工利润率数据未提取！'.format(v.commodity))
 
         return {'future_df': future_df, 'spot_df': spot_df, 'inventory_df': inventory_df, 'profit_df': profit_df}
 
@@ -102,6 +105,7 @@ class Basic(BacktestSys):
 
         data_df = self.get_fundamental_data()
 
+        # prediction = pd.DataFrame(index=self.dt, columns=list(self.data['future_price'].keys()))
         for k, v in self.data['future_price'].items():
             print('\r' + v.commodity)
             holdings.add_holdings(k, np.zeros(len(self.dt)))
@@ -122,7 +126,12 @@ class Basic(BacktestSys):
             for i in range(start+120, len(self.dt)):    # 最少有120个样本
                 print('\r'+self.dt[i].strftime('%Y-%m-%d'), end='')
                 arrays = vectors_df.iloc[start:i+1, :].to_dict(orient='series')
-                prediction = self.var_forecast(steps=1, **arrays)  # 传入**kwarg参数，用字典形式时需要加**，用赋值形式时不需要**
+                # if self.var_forecast(steps=1, **arrays):  # 存在回归预测值的情况
+                #     column = prediction.columns.tolist().index(k)
+                #     prediction.iloc[i, column] = self.var_forecast(steps=1, **arrays)
+                #     # 传入**kwarg参数，用字典形式时需要加**，用赋值形式时不需要**
+                #     # df.loc和df['column']是只读模式，不能改变值，df.iloc可以改变值
+                prediction = self.var_forecast(steps=1, **arrays)
                 if prediction:
                     if prediction['return'] >= 0:
                         getattr(holdings, k)[i] = 1
@@ -134,9 +143,10 @@ class Basic(BacktestSys):
     def strategy_2(self, on):
         holdings_num = 3
         holdings = HoldingClass(self.dt)
+        data_df = self.get_fundamental_data()
 
-        bs_df = 1-future_df/spot_df
-        iv_df = inventory_df.pct_change(periods=5)+1
+        bs_df = 1-data_df['future_df']/data_df['spot_df']
+        iv_df = data_df['inventory_df'].pct_change(periods=5)+1
         if on == 'iv':
             key_df = iv_df
             # key_df = inventory_df/inventory_df.rolling(window=30, min_periods=1).mean().shift(periods=235)
@@ -148,7 +158,7 @@ class Basic(BacktestSys):
             bs_rank = bs_df.rank(axis=1)
             iv_rank = iv_df.rank(axis=1)
             # key_df = bs_rank / iv_df
-            # key_df = bs_rank / iv_rank
+            key_df = bs_rank / iv_rank
             # key_df = bs_rank - iv_df
             rank_df = key_df.rank(ascending=1, method='first', axis=1)
 
@@ -171,10 +181,10 @@ if __name__ == '__main__':
 
     holdings = ins.strategy_1()
     # holdings = ins.strategy_2(on='basis_iv')
-    holdings.to_frame().to_csv(r'C:\Users\uuuu\Desktop\holding_df1.csv', encoding='gbk')
-    ins.holdingsStandardization(holdings, mode=2)
+    # holdings.to_frame().to_csv(r'C:\Users\uuuu\Desktop\holding_df1.csv', encoding='gbk')
+    ins.holdingsStandardization(holdings, mode=0)
     holdings = ins.holdingsProcess(holdings)
-    holdings.to_frame().to_csv(r'C:\Users\uuuu\Desktop\holding_df2.csv', encoding='gbk')
+    # holdings.to_frame().to_csv(r'C:\Users\uuuu\Desktop\holding_df2.csv', encoding='gbk')
 
     ins.displayResult(holdings)
 

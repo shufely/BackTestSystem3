@@ -22,167 +22,167 @@ data:
       obj_field: wind_code
       obj_content: TA.CZC
       commodity: PTA
-      fields: [OPEN, CLOSE]
+      fields: [OPEN, CLOSE, HIGH, LOW]
 
     - collection: FuturesMD
       obj_field: wind_code
       obj_content: EG.DCE
       commodity: MEG
-      fields: [OPEN, CLOSE]
+      fields: [OPEN, CLOSE, HIGH, LOW]
 
     -
       collection: FuturesMD
       obj_field: wind_code
       obj_content: L.DCE
       commodity: LL
-      fields: [OPEN, CLOSE]
+      fields: [OPEN, CLOSE, HIGH, LOW]
 
     -
       collection: FuturesMD
       obj_field: wind_code
       obj_content: MA.CZC
       commodity: MA
-      fields: [OPEN, CLOSE]
+      fields: [OPEN, CLOSE, HIGH, LOW]
 
     -
       collection: FuturesMD
       obj_field: wind_code
       obj_content: RB.SHF
       commodity: RB
-      fields: [OPEN, CLOSE]
+      fields: [OPEN, CLOSE, HIGH, LOW]
 
     -
       collection: FuturesMD
       obj_field: wind_code
       obj_content: J.DCE
       commodity: J
-      fields: [OPEN, CLOSE]
+      fields: [OPEN, CLOSE, HIGH, LOW]
 
     -
       collection: FuturesMD
       obj_field: wind_code
       obj_content: JM.DCE
       commodity: JM
-      fields: [OPEN, CLOSE]
+      fields: [OPEN, CLOSE, HIGH, LOW]
 
     -
       collection: FuturesMD
       obj_field: wind_code
       obj_content: HC.SHF
       commodity: HC
-      fields: [OPEN, CLOSE]
+      fields: [OPEN, CLOSE, HIGH, LOW]
 
     -
       collection: FuturesMD
       obj_field: wind_code
       obj_content: BU.SHF
       commodity: BU
-      fields: [OPEN, CLOSE]
+      fields: [OPEN, CLOSE, HIGH, LOW]
 
     -
       collection: FuturesMD
       obj_field: wind_code
       obj_content: ZC.CZC
       commodity: ZC
-      fields: [OPEN, CLOSE]
+      fields: [OPEN, CLOSE, HIGH, LOW]
 
     -
       collection: FuturesMD
       obj_field: wind_code
       obj_content: I.DCE
       commodity: I
-      fields: [OPEN, CLOSE]
+      fields: [OPEN, CLOSE, HIGH, LOW]
 
     -
       collection: FuturesMD
       obj_field: wind_code
       obj_content: PP.DCE
       commodity: PP
-      fields: [OPEN, CLOSE]
+      fields: [OPEN, CLOSE, HIGH, LOW]
 
     -
       collection: FuturesMD
       obj_field: wind_code
       obj_content: V.DCE
       commodity: PVC
-      fields: [OPEN, CLOSE]
+      fields: [OPEN, CLOSE, HIGH, LOW]
 
     -
       collection: FuturesMD
       obj_field: wind_code
       obj_content: RU.SHF
       commodity: RU
-      fields: [OPEN, CLOSE]
+      fields: [OPEN, CLOSE, HIGH, LOW]
 
     -
       collection: FuturesMD
       obj_field: wind_code
       obj_content: SC.INE
       commodity: SC
-      fields: [OPEN, CLOSE]
+      fields: [OPEN, CLOSE, HIGH, LOW]
 
     -
       collection: FuturesMD
       obj_field: wind_code
       obj_content: FU.SHF
       commodity: FU
-      fields: [OPEN, CLOSE]
+      fields: [OPEN, CLOSE, HIGH, LOW]
 
-    -
-      collection: FuturesMD
-      obj_field: tr_code
-      obj_content: LCOc1
-      commodity: Brent
-      fields: [OPEN, CLOSE]
-      unit_change: dollar
-
-    -
-      collection: FuturesMD
-      obj_field: tr_code
-      obj_content: CLc1
-      commodity: WTI
-      fields: [OPEN, CLOSE]
-      unit_change: dollar
-
-    -
-      collection: FuturesMD
-      obj_field: tr_code
-      obj_content: RBc1
-      commodity: RBOB
-      fields: [OPEN, CLOSE]
-      unit_change: dollar
-
-    -
-      collection: FuturesMD
-      obj_field: tr_code
-      obj_content: HOc1
-      commodity: HO
-      fields: [OPEN, CLOSE]
-      unit_change: dollar
-
-    -
-      collection: FuturesMD
-      obj_field: tr_code
-      obj_content: NACFRJPSWMc1
-      commodity: MOPJ
-      fields: [CLOSE]
-      unit_change: dollar
-
-    -
-      collection: FuturesMD
-      obj_field: tr_code
-      obj_content: GO10SGSWMc1
-      commodity: Gasoil10
-      fields: [CLOSE]
-      unit_change: dollar
-
-    -
-      collection: FuturesMD
-      obj_field: tr_code
-      obj_content: MOG92SGMc1
-      commodity: MOGAS
-      fields: [CLOSE]
-      unit_change: dollar
+#    -
+#      collection: FuturesMD
+#      obj_field: tr_code
+#      obj_content: LCOc1
+#      commodity: Brent
+#      fields: [OPEN, CLOSE]
+#      unit_change: dollar
+#
+#    -
+#      collection: FuturesMD
+#      obj_field: tr_code
+#      obj_content: CLc1
+#      commodity: WTI
+#      fields: [OPEN, CLOSE]
+#      unit_change: dollar
+#
+#    -
+#      collection: FuturesMD
+#      obj_field: tr_code
+#      obj_content: RBc1
+#      commodity: RBOB
+#      fields: [OPEN, CLOSE]
+#      unit_change: dollar
+#
+#    -
+#      collection: FuturesMD
+#      obj_field: tr_code
+#      obj_content: HOc1
+#      commodity: HO
+#      fields: [OPEN, CLOSE]
+#      unit_change: dollar
+#
+#    -
+#      collection: FuturesMD
+#      obj_field: tr_code
+#      obj_content: NACFRJPSWMc1
+#      commodity: MOPJ
+#      fields: [CLOSE]
+#      unit_change: dollar
+#
+#    -
+#      collection: FuturesMD
+#      obj_field: tr_code
+#      obj_content: GO10SGSWMc1
+#      commodity: Gasoil10
+#      fields: [CLOSE]
+#      unit_change: dollar
+#
+#    -
+#      collection: FuturesMD
+#      obj_field: tr_code
+#      obj_content: MOG92SGMc1
+#      commodity: MOGAS
+#      fields: [CLOSE]
+#      unit_change: dollar
 
 
 trade_unit:

@@ -375,7 +375,7 @@ class TradeRecordByDay(object):
         for k, v in list(self.holdPosition.items()):
             if 'volume' in v:
                 if k not in self.mkdata:
-                    print('%s合约%s没有数据' % (k, self.dt.strftime('%Y%m%d')))
+                    # print('%s合约%s没有数据' % (k, self.dt.strftime('%Y%m%d')))
                     continue
                 if 'PRECLOSE' not in self.mkdata[k]:
                     print(self.dt, self.mkdata[k])
@@ -569,8 +569,8 @@ class BacktestSys(object):
             getattr(self, self.exchange_func[k]).rearrange_ts_data(self.dt)
             getattr(self, self.exchange_func[k]).fillna_ts_data(obj_name='CLOSE', method='ffill')
             if np.isnan(getattr(self, self.exchange_func[k]).CLOSE).any():
-                print('%s出现了nan值，使用向前填充' % self.exchange_func[k])
-                print(self.dt[np.isnan(getattr(self, self.exchange_func[k]).CLOSE)])
+                # print('%s出现了nan值，使用向前填充' % self.exchange_func[k])
+                # print(self.dt[np.isnan(getattr(self, self.exchange_func[k]).CLOSE)])
                 getattr(self, self.exchange_func[k]).fillna_ts_data(obj_name='CLOSE', method='bfill')
 
         # 在exchange_func中增加与unchange对应的函数
@@ -595,7 +595,7 @@ class BacktestSys(object):
         # 对生成的持仓进行处理，需要注意的是这个函数要最后再用
         # 如果在配置文件中的持仓周期大于1，需要对持仓进行调整。通常该参数是针对alpha策略。
         if self.turnover > 1:
-            print('根据turnover对持仓进行调整，请检查是否为alpha策略')
+            # print('根据turnover对持仓进行调整，请检查是否为alpha策略')
             holdingsObj.adjust_holdings_turnover(self.turnover)
 
         if self.bt_mode == 'OPEN':
@@ -616,8 +616,8 @@ class BacktestSys(object):
                     continue
                 if (np.isnan(h_cls[i]) or ('OPEN' in self.data['future_price'][h].__dict__ and np.isnan(h_opn[i]))) and \
                     h_holdings[i] != h_holdings[i-1]:
-                    print('%s合约在%s这一天没有成交，对持仓进行了调整，调整前是%f，调整后是%f' % \
-                          (h, self.dt[i].strftime('%Y%m%d'), h_holdings[i], h_holdings[i - 1]))
+                    # print('%s合约在%s这一天没有成交，对持仓进行了调整，调整前是%f，调整后是%f' % \
+                    #       (h, self.dt[i].strftime('%Y%m%d'), h_holdings[i], h_holdings[i - 1]))
                     h_holdings[i] = h_holdings[i-1]
                     # setattr(holdingsObj, h, h_holdings)  这一句不用，因为取出的list内存地址是共用的。
         return holdingsObj
@@ -899,7 +899,7 @@ class BacktestSys(object):
                 if np.isnan(future_price[h].CLOSE[:i+1]).all():
                     continue
                 if np.isnan(cls_td):
-                    print('%s合约在%s这一天没有收盘数据' % (h, v.strftime('%Y%m%d')))
+                    # print('%s合约在%s这一天没有收盘数据' % (h, v.strftime('%Y%m%d')))
                     continue
                 # 需要传入的市场数据
                 mkdata[h] = {'CLOSE': cls_td,
@@ -938,7 +938,7 @@ class BacktestSys(object):
                                 mkdata[h]['PRECLOSE'] = future_price[h].CLOSE[i - pre_counter]
                                 mkdata[h]['PRECLOSE_ExRate'] = getattr(
                                     self, self.exchange_func[future_price[h].unit_change]).CLOSE[i - pre_counter]
-                                print('%s合约在%s使用的PRECLOSE是%d天前的收盘价' % (h, self.dt[i].strftime('%Y%m%d'), pre_counter))
+                                # print('%s合约在%s使用的PRECLOSE是%d天前的收盘价' % (h, self.dt[i].strftime('%Y%m%d'), pre_counter))
                                 break
 
                     # 如果切换主力合约
@@ -956,22 +956,22 @@ class BacktestSys(object):
                             table = self.db['FuturesMD']
                             if mkdata[h]['specific_contract'] == 'nan':
                                 # 对于MA.CZC, ZC.CZC的品种，之前没有specific_contract字段，使用前一交易日的收盘价
-                                print('%s在%s的前一交易日没有specific_contract字段，使用前一交易日的收盘价换约平仓' % \
-                                      (h, self.dt[i].strftime('%Y%m%d')))
+                                # print('%s在%s的前一交易日没有specific_contract字段，使用前一交易日的收盘价换约平仓' % \
+                                      # (h, self.dt[i].strftime('%Y%m%d')))
                                 old_open = future_price[h].CLOSE[i - 1]
                                 old_open_exrate = getattr(self, self.exchange_func[future_price[h].unit_change]).CLOSE[i - 1]
                             elif table.find_one(queryArgs, projectionField):
                                 old_open = table.find_one(queryArgs, projectionField)['OPEN']
                                 old_open_exrate = getattr(self, self.exchange_func[future_price[h].unit_change]).CLOSE[i]
                                 if np.isnan(old_open):
-                                    print('%s因为该合约当天没有交易，在%s使用前一天的收盘价作为换约平仓的价格' % \
-                                          (mkdata[h]['specific_contract'], self.dt[i].strftime('%Y%m%d')))
+                                    # print('%s因为该合约当天没有交易，在%s使用前一天的收盘价作为换约平仓的价格' % \
+                                    #       (mkdata[h]['specific_contract'], self.dt[i].strftime('%Y%m%d')))
                                     # 这样的处理方法有个问题，在实盘的交易中无法实现这样的操作。这里只是回测时的处理方法
                                     old_open = mkdata[h]['PRECLOSE']
                                     old_open_exrate = mkdata[h]['PRECLOSE_ExRate']
                             else:
-                                print('%s因为已经到期，在%s使用的是前一天的收盘价作为换约平仓的价格' % \
-                                      (mkdata[h]['specific_contract'], self.dt[i].strftime('%Y%m%d')))
+                                # print('%s因为已经到期，在%s使用的是前一天的收盘价作为换约平仓的价格' % \
+                                #       (mkdata[h]['specific_contract'], self.dt[i].strftime('%Y%m%d')))
                                 old_open = mkdata[h]['PRECLOSE']
                                 old_open_exrate = mkdata[h]['PRECLOSE_ExRate']
 
@@ -1122,21 +1122,21 @@ class BacktestSys(object):
 
                     if res == 'nan':
                         # 对于MA.CZC, ZC.CZC的品种，之前没有specific_contract字段，使用前一交易日的收盘价
-                        print('%s在%s的前一交易日没有specific_contract字段，使用前一交易日的收盘价换约平仓' % \
-                              (k, self.dt[i].strftime('%Y%m%d')))
+                        # print('%s在%s的前一交易日没有specific_contract字段，使用前一交易日的收盘价换约平仓' % \
+                        #       (k, self.dt[i].strftime('%Y%m%d')))
                         trade_price_switch = future_price[k].CLOSE[i-1]
                         trade_exrate_switch = getattr(self, self.exchange_func[future_price[k].unit_change]).CLOSE[i-1]
                     elif table.find_one(queryArgs, projectionField):
                         trade_price_switch = table.find_one(queryArgs, projectionField)['OPEN']
                         trade_exrate_switch = getattr(self, self.exchange_func[future_price[k].unit_change]).CLOSE[i]
                         if np.isnan(trade_price_switch):
-                            print('%s因为该合约当天没有交易，在%s使用前一天的收盘价作为换约平仓的价格' % \
-                                  (res, self.dt[i].strftime('%Y%m%d')))
+                            # print('%s因为该合约当天没有交易，在%s使用前一天的收盘价作为换约平仓的价格' % \
+                            #       (res, self.dt[i].strftime('%Y%m%d')))
                             trade_price_switch = future_price[k].CLOSE[i-1]
                             trade_exrate_switch = getattr(self, self.exchange_func[future_price[k].unit_change]).CLOSE[i - 1]
                     else:
-                        print('%s因为已经到期，在%s使用的是前一天的收盘价作为换约平仓的价格' % \
-                              (res, self.dt[i].strftime('%Y%m%d')))
+                        # print('%s因为已经到期，在%s使用的是前一天的收盘价作为换约平仓的价格' % \
+                        #       (res, self.dt[i].strftime('%Y%m%d')))
                         trade_price_switch = future_price[k].CLOSE[i-1]
                         trade_exrate_switch = getattr(self, self.exchange_func[future_price[k].unit_change]).CLOSE[i - 1]
 
@@ -1592,13 +1592,12 @@ class BacktestSys(object):
 
         return res_df
 
-    def getTotalResult(self, holdingsObj, show=True):
+    def getTotalResult(self, holdingsObj, show=False):
 
         pnl, margin_occ, value, turnover_rate = self.getPnlDaily(holdingsObj)
         nv = 1. + np.cumsum(pnl) / self.capital  # 转换成初始净值为1
         res = self.calcIndicatorByYear(nv, turnover_rate, show=show)
         return res
-
 
 
 if __name__ == '__main__':

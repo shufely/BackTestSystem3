@@ -181,6 +181,9 @@ class Reversion(BacktestSys):
                 holdings.update_holdings(ctr_list[j], getattr(holdings, ctr_list[j]) + (position * cof))
                 abg_holdings[k].add_holdings(ctr_list[j], position * cof)
 
+        self.holdingsStandardization(holdings, mode=0)
+        holdings = self.holdingsProcess(holdings)
+
         if abg is None:
             return holdings
         elif abg in self.abg_dict.keys():
@@ -193,14 +196,12 @@ class Reversion(BacktestSys):
         # print(nv, yields, sharpe, drawback, trade_times)
 
         for open_pt in np.arange(1, 4, 0.1):
-            wgt = self.strategy(open_pt, indicator, abg)
-            wgt = self.wgtsStandardization(wgt)
+            holdings = self.strategy(open_pt, indicator, abg)
 
-            nv.append(self.getNV(wgt)[-1])
-            yields.append(self.result(wgt)['annual_rtn'])
-            sharpe.append(self.result(wgt)['sharpe'])
-            drawback.append(self.result(wgt)['max_drawdown'])
-            trade_times.append(self.result(wgt)['trade_times'])
+            nv.append(self.getNV(holdings)[-1])
+            # yields.append(self.calcIndicator(holdings)[0])
+            # sharpe.append(self.calcIndicator(holdings)[2])
+            # drawback.append(self.calcIndicator(holdings)[3])
 
             self.ProgressBar((open_pt - 1) / 0.1 + 1, len(np.arange(1, 4, 0.1)))
 
@@ -213,25 +214,22 @@ class Reversion(BacktestSys):
         else:
             raise KeyError
 
-        print(nv, yields, sharpe, drawback, trade_times)
+        print(nv, yields, sharpe, drawback)
+        print(open_pt_optimal)
 
         plt.figure()
-        plt.subplot(411)
+        plt.subplot(311)
         plt.plot(np.arange(1, 4, 0.1), nv, label='期末净值')
         # plt.xlabel('建仓点')
         # plt.ylabel('期末净值')
         plt.legend()
 
-        plt.subplot(412)
+        plt.subplot(312)
         plt.plot(np.arange(1, 4, 0.1), drawback, label='最大回撤')
         plt.legend()
 
-        plt.subplot(413)
+        plt.subplot(313)
         plt.plot(np.arange(1, 4, 0.1), sharpe, label='夏普比率')
-        plt.legend()
-
-        plt.subplot(414)
-        plt.bar(np.arange(1, 4, 0.1), trade_times, width=0.05, label='交易次数')
         plt.legend()
 
         plt.show()
@@ -254,12 +252,9 @@ class Reversion(BacktestSys):
 
 if __name__ == '__main__':
     ins = Reversion()
-    holdings = ins.strategy(open_pt=3, indicator='S')
-    # ins.optimal_open(criterion='NV', indicator='S')
-    ins.holdingsStandardization(holdings, mode=1)
-    holdings = ins.holdingsProcess(holdings)
+    holdings = ins.strategy(open_pt=1.4, indicator='S')
+    # open_pt_optimal = ins.optimal_open(criterion='NV', indicator='S')
     ins.displayResult(holdings)
-    # ins.result(wgt)
 
 
 

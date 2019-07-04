@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import pprint
-from .base import HoldingClass, BacktestSys
+from base import HoldingClass, BacktestSys
 
 
 class test(BacktestSys):
@@ -34,6 +34,9 @@ if __name__ == '__main__':
 
     a = test()
     holdings = a.strategy()
+    holdings.to_frame().to_csv(r'C:\Users\uuuu\Desktop\holding_df1.csv', encoding='gbk')
     holdings = a.holdingsStandardization(holdings, mode=3)
+    holdings.to_frame().to_csv(r'C:\Users\uuuu\Desktop\holding_df2.csv', encoding='gbk')
     holdings = a.holdingsProcess(holdings)
+    holdings.to_frame().to_csv(r'C:\Users\uuuu\Desktop\holding_df3.csv', encoding='gbk')
     a.displayResult(holdings)
