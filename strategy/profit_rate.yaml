@@ -5,8 +5,8 @@ db_name: CBNB
 user: liye
 pwd: liye
 
-start_date: '20130101'
-end_date: '20190702'
+start_date: '20150101'
+end_date: '20190709'
 capital: 1e7
 backtest_mode: OPEN  # 回测方式，CLOSE为以当天收盘价交易, OPEN为以第二天开盘价交易
 
@@ -101,6 +101,12 @@ data:
       obj_field: wind_code
       obj_content: EG.DCE
       commodity: EG
+      fields: [OPEN, CLOSE, HIGH, LOW, VOLUME]
+
+    -
+      obj_field: wind_code
+      obj_content: FU.SHF
+      commodity: FU
       fields: [OPEN, CLOSE, HIGH, LOW, VOLUME]
 
   profit_rate:
@@ -280,7 +286,16 @@ data:
       commodity: BU
       fields: [price]
 
-    - collection: SpotMD
+    -
+      collection: SpotMD
+      obj_field: tr_code
+      obj_content: FO380-SIN
+      commodity: FU
+      fields: [CLOSE]
+      unit_change: dollar
+
+    -
+      collection: SpotMD
       obj_field: commodity
       obj_content: "MEG"
       commodity: EG
@@ -297,6 +312,8 @@ data:
     - collection: Inventory
       obj_field: commodity
       obj_content: LL
+      add_query:
+          area: LL石化库存
       commodity: L
       fields: [inventory]
       frequency: weekly
@@ -389,6 +406,8 @@ data:
     - collection: Inventory
       obj_field: commodity
       obj_content: PP
+      add_query:
+          area: PP石化库存
       commodity: PP
       fields: [inventory]
       frequency: weekly
@@ -405,6 +424,13 @@ data:
       obj_content: MEG
       commodity: EG
       fields: [inventory]
+      frequency: weekly
+
+    - collection: Inventory
+      obj_field: tr_code
+      obj_content: STKRS-SIN
+      commodity: FU
+      fields: [CLOSE]
       frequency: weekly
 
   future_index:
@@ -506,6 +532,13 @@ data:
       commodity: EG
       fields: [VOLUME, OI]
 
+    -
+      collection: DerivDB
+      obj_field: name
+      obj_content: FU888.SHF
+      commodity: FU
+      fields: [VOLUME, OI]
+
 
 trade_unit:
   TA: 5
@@ -522,6 +555,7 @@ trade_unit:
   V: 5
   EG: 10
   RU: 10
+  FU: 10
 
 margin_ratio:
   TA.CZC: 0.07
@@ -538,6 +572,7 @@ margin_ratio:
   V.DCE: 0.07
   EG.DCE: 0.07
   RU.SHF: 0.09
+  FU.SHF: 0.05
 
 
 
@@ -584,3 +619,6 @@ tcost_list:
   RU.SHF:
     mode: percentage
     value: 0.00045
+  FU.SHF:
+    mode: percentage
+    value: 0.0002

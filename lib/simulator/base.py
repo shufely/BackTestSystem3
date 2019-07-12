@@ -142,7 +142,6 @@ class HoldingClass(object):
         setattr(self, contract, holdings)
         self.newest_holdings[contract] = holdings[-1]
 
-
     # 将持仓情况向后平移
     @auto_check
     def shift_holdings(self):

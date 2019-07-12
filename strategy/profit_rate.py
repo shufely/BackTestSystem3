@@ -59,6 +59,14 @@ class BasisSpread(BacktestSys):
 
         for k, v in future_price.items():
             fp_df[v.commodity] = v.CLOSE
+            if v.commodity == 'FU':
+                fp_df.loc[:'2018-07-16', 'FU'] = np.nan
+        fp_df.to_csv(r'C:\Users\uuuu\Desktop\fp_df.csv')
+
+        def remove_invalid(fp_df, df):
+            for commodity in df.columns:
+                first_day = fp_df[commodity].dropna().index[0]
+                df.loc[:first_day, commodity] = np.nan
 
         for k, v in future_index.items():
             index_vol[v.commodity] = v.VOLUME
@@ -74,6 +82,7 @@ class BasisSpread(BacktestSys):
 
         df_profit = df_profit * oi_chg * vol_chg
         df_profit.dropna(axis=1, inplace=True, how='all')
+        remove_invalid(fp_df, df_profit)
 
         profit_rank = df_profit.rank(axis=1)
         profit_count = profit_rank.count(axis=1)
@@ -88,6 +97,7 @@ class BasisSpread(BacktestSys):
         iv_change = (iv_df - iv_mean) / iv_std
 
         iv_change = iv_change * oi_chg * vol_chg
+        remove_invalid(fp_df, iv_change)
 
         # iv_change = iv_df.pct_change(periods=5)
         iv_rank = iv_change.rank(axis=1)
@@ -96,11 +106,13 @@ class BasisSpread(BacktestSys):
         holdings_iv_num = np.minimum(iv_rank_count // 2, num)
         holdings_iv_num[holdings_iv_num == 0] = np.nan
 
+        sp_df['I'] = sp_df['I'] / 0.92
+        sp_df['FU'] = (sp_df['FU']+7) * self.dollar2rmb.CLOSE
         # ================回测的时候需要========================
         # 现货价格需要往后移一天
-        sp_df = sp_df.shift(periods=1)
+        # sp_df = sp_df.shift(periods=1)
 
-        bs_df = 1. - fp_df[sp_df.columns] / sp_df
+        bs_df = 1 - fp_df[sp_df.columns] / sp_df
         # bs_df = sp_df - fp_df[sp_df.columns]
         # bs_mean = bs_df.rolling(window=250, min_periods=200).mean()
         # bs_std = bs_df.rolling(window=250, min_periods=200).std()
@@ -122,6 +134,10 @@ class BasisSpread(BacktestSys):
         holdings_rtn_num[holdings_rtn_num == 0] = np.nan
 
         holdings_df = pd.DataFrame(0, index=self.dt, columns=list(future_price.keys()))
+
+        iv_rank.to_csv(r'C:\Users\uuuu\Desktop\iv_rank.csv')
+        bs_rank.to_csv(r'C:\Users\uuuu\Desktop\bs_rank.csv')
+        profit_rank.to_csv(r'C:\Users\uuuu\Desktop\profit_rank.csv')
 
         for c in holdings_df:
             for k, v in future_price.items():
@@ -179,6 +195,26 @@ class BasisSpread(BacktestSys):
         # for x in ['num', 'profit_window', 'iv_window', 'short_window', 'long_window', 'NV']:
         #     print('{}:{}'.format(x, final_df[x][max_id]))
 
+    def multi_strategy(self):
+        holdings = HoldingClass(self.dt)
+
+        strategy_dict = {'AnnualRtn': self.strategy(3, 150, 90, 30, 25),  # 年均收益率最大
+                         'sharp': self.strategy(5, 190, 80, 40, 15),  # 夏普值最大
+                         'MaxDrawdown': self.strategy(4, 20, 90, 30, 5),  # 最大回撤最小
+                         'current': self.strategy(3, 20, 60, 20, 5),
+                         }
+
+        for k, v in strategy_dict.items():
+            for c in v.asset:
+                if c not in holdings.asset:
+                    holdings.add_holdings(c, getattr(v, c))
+                else:
+                    holdings.update_holdings(c, getattr(holdings, c)+getattr(v, c))
+
+        holdings = self.holdingsStandardization(holdings, mode=1)
+        holdings = self.holdingsProcess(holdings)
+        self.displayResult(holdings, saveLocal=True)
+
 
 if __name__ == '__main__':
     a = BasisSpread()
@@ -186,8 +222,10 @@ if __name__ == '__main__':
     # holdings = a.strategy(5, 190, 80, 40, 15)
     holdings = a.holdingsStandardization(holdings, mode=1)
     holdings = a.holdingsProcess(holdings)
+    holdings.to_frame().to_csv(r'C:\Users\uuuu\Desktop\holdings.csv', encoding='gbk')
     #
     a.displayResult(holdings, saveLocal=True)
     # a.optimal()
+    # a.multi_strategy()
 
 
